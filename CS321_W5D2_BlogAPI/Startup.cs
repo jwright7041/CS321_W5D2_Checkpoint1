@@ -76,11 +76,12 @@ namespace CS321_W5D2_BlogAPI
 
             app.UseAuthentication();
 
-            app.UseMvc(routes =>
+            app.UseRouting();
+            app.UseEndpoints(routes =>
             {
-                routes.MapRoute(
+                routes.MapControllerRoute(
                     name: "default",
-                    template: "{controller}/{action=Index}/{id?}");
+                    pattern: "{controller}/{action=Index}/{id?}");
             });
 
             app.UseSpa(spa =>
