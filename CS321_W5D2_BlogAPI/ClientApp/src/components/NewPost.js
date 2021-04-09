@@ -38,7 +38,7 @@ class NewPost extends Component {
     const { history } = this.props;
     const { blogId } = this.props.match.params;
     const { postModel } = this.state;
-    postModel.blogId = blogId;
+
     apiCall(`/api/blogs/${blogId}/posts`, {
       method: 'POST',
       headers: {
