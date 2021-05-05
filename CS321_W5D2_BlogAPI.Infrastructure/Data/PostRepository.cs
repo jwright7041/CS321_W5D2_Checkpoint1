@@ -9,45 +9,66 @@ namespace CS321_W5D2_BlogAPI.Infrastructure.Data
 {
     public class PostRepository : IPostRepository
     {
+        private AppDbContext _dbContext;
         public PostRepository(AppDbContext dbContext) 
-        {  
+        {
+            _dbContext = dbContext;
         }
 
         public Post Get(int id)
         {
-            // TODO: Implement Get(id). Include related Blog and Blog.User
-            throw new NotImplementedException();
+            return _dbContext.Posts
+                .Include(p => p.Blog)
+                .ThenInclude(b => b.User)
+                .FirstOrDefault(b => b.Id == id);
         }
 
         public IEnumerable<Post> GetBlogPosts(int blogId)
         {
-            // TODO: Implement GetBlogPosts, return all posts for given blog id
-            // TODO: Include related Blog and AppUser
-            throw new NotImplementedException();
+            return _dbContext.Posts
+                .Include(p => p.Blog)
+                .ThenInclude(b => b.User)
+                .Where(b => b.BlogId == blogId)
+                .ToList();
         }
 
-        public Post Add(Post Post)
+        public Post Add(Post post)
         {
-            // TODO: add Post
-            throw new NotImplementedException();
+            _dbContext.Posts.Add(post);
+            _dbContext.SaveChanges();
+
+            return post;
         }
 
-        public Post Update(Post Post)
+        public Post Update(Post post)
         {
-            // TODO: update Post
-            throw new NotImplementedException();
+            var existingItem = _dbContext.Posts.Find(post.Id);
+
+            if (existingItem == null) 
+                return null;
+
+            _dbContext.Entry(existingItem)
+               .CurrentValues
+               .SetValues(post);
+
+            _dbContext.Update(existingItem);
+
+            _dbContext.SaveChanges();
+
+            return existingItem;
         }
 
         public IEnumerable<Post> GetAll()
         {
-            // TODO: get all posts
-            throw new NotImplementedException();
+            return _dbContext.Posts.ToList();
         }
 
         public void Remove(int id)
         {
-            // TODO: remove Post
-            throw new NotImplementedException();
+            var current = Get(id);
+
+            _dbContext.Posts.Remove(current);
+            _dbContext.SaveChanges();
         }
 
     }

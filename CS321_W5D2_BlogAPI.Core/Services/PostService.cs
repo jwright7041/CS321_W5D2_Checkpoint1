@@ -23,6 +23,16 @@ namespace CS321_W5D2_BlogAPI.Core.Services
             //     Use the _userService to get the current users id.
             //     You may have to retrieve the blog in order to check user id
             // TODO: assign the current date to DatePublished
+            var currentBlog = _blogRepository.Get(newPost.BlogId);
+
+            if (currentBlog == null)
+                throw new Exception($"blog {newPost.BlogId} not found");
+
+            if (currentBlog.UserId != _userService.CurrentUserId)
+                throw new Exception($"user {_userService.CurrentUserId} does not have permission to add to this blog");
+
+            newPost.DatePublished = DateTime.Now;
+
             return _postRepository.Add(newPost);
         }
 
@@ -43,14 +53,21 @@ namespace CS321_W5D2_BlogAPI.Core.Services
 
         public void Remove(int id)
         {
-            var post = this.Get(id);
-            // TODO: prevent user from deleting from a blog that isn't theirs
+            var post = Get(id);
+
+            if (post.Blog.UserId != _userService.CurrentUserId)
+                throw new Exception($"user {_userService.CurrentUserId} does not have permission to remove this post");
+
             _postRepository.Remove(id);
         }
 
         public Post Update(Post updatedPost)
         {
-            // TODO: prevent user from updating a blog that isn't theirs
+            var currentBlog = Get(updatedPost.Id);
+
+            if (currentBlog.Blog.UserId != _userService.CurrentUserId)
+                throw new Exception($"user {_userService.CurrentUserId} does not have permission to edit this post");
+
             return _postRepository.Update(updatedPost);
         }
 
